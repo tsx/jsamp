@@ -118,8 +118,7 @@ public class JSamp implements Runnable {
 		}
 		long end = System.currentTimeMillis();
 
-		System.out.println("duration = " + (end - start) + " " + samples.size()
-				+ " samples; real rate = " + ((end - start) / samples.size()));
+		System.out.println(samples.size() + " samples; real rate = " + ((end - start) / samples.size()));
 		try {
 			PrintStream out = new PrintStream(new File(outputPath));
 			dumpSamples(out, Thread.currentThread());
@@ -136,11 +135,9 @@ public class JSamp implements Runnable {
 	public static void agentmain(String agentargs) {
 		final String[] args = agentargs.split(";");
 
-		// currently, duration is ignored.
-		final int duration = Integer.parseInt(args[0]);
-		final int interval = Integer.parseInt(args[1]);
-		final int port     = Integer.parseInt(args[2]);
-		final String outputPath = args[3];
+		final int interval = Integer.parseInt(args[0]);
+		final int port     = Integer.parseInt(args[1]);
+		final String outputPath = args[2];
 
 		final JSamp jsampler = new JSamp(interval, outputPath);
 
