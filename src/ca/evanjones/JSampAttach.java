@@ -47,7 +47,7 @@ public class JSampAttach {
         return files;
     }
 
-    private static final String JAR_NAME = "jsampler.jar";
+    private static final String JAR_NAME = "jsamp.jar";
 
     public static void perrorQuit(String message, Exception e) {
         System.err.println("Error: " + message + ": " + e.getMessage());
@@ -55,7 +55,7 @@ public class JSampAttach {
     }
 
     public static void main(String[] args) {
-        if (args.length != 5) {
+        if (args.length != 4) {
             System.err.println("Usage: JSampAttach <jvmpid> <interval> <port> <output file>");
             System.exit(1);
         }
