@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008 Evan Jones
+Copyright (c) 2008 Evan Jones, Yang Zhang
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ public class JSampAttach {
 
     public static void main(String[] args) {
         if (args.length != 4) {
-            System.err.println("Usage: JSampAttach <jvmpid> <interval> <port> <output file>");
+            System.err.println("Usage: JSampAttach <JVM pid> <interval> <port> <output file>");
             System.exit(1);
         }
 
