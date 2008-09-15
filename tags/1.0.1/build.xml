@@ -1,0 +1,31 @@
+<project name="jsamp" default="jar">
+
+<property name="src" value="src" />
+<property name="build" value="build" />
+<property name="jarbuild" value="build" />
+<property name="depcache" value=".depcache" />
+<property name="java_source" value="1.6" />
+<property name="javac_args" value="-Xlint:unchecked"/>
+
+<target name="compile" description="Compiles code, output goes to the build dir.">
+    <mkdir dir="${build}" />
+    <depend srcdir="${src}" destdir="${build}" cache="${depcache}"/>
+    <javac srcdir="${src}" destdir="${build}" debug="true" source="${java_source}" includes="ca/evanjones/*.java">
+        <compilerarg value="${javac_args}"/>
+    </javac>
+</target>
+
+<target name="jar" description="Build the jar." depends="compile">
+    <jar destfile="${jarbuild}/jsamp.jar" basedir="${build}" includes="**/*.class" index="no">
+        <manifest>
+            <attribute name="Main-Class" value="ca.evanjones.RunWithToolsJar"/>
+            <attribute name="Agent-Class" value="ca.evanjones.JSamp"/>
+        </manifest>
+    </jar>
+</target>
+
+<target name="clean" description="Destroys all generated files and dirs.">
+    <delete dir="${build}"/>
+    <delete dir="${depcache}"/>
+</target>
+</project>
