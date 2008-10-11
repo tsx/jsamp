@@ -142,17 +142,23 @@ public class JSamp implements Runnable {
 		final JSamp jsampler = new JSamp(interval, outputPath);
 
 		// start jsampler in its own thread
-		new Thread(jsampler, "JSamp").start();
+		final Thread jsamplerThread = new Thread(jsampler, "JSamp");
+		jsamplerThread.start();
 
 		// kill jsampler as soon as we get a connection on the specified port
+		// The other connection will "hang" until jsampler has quit. This keeps
+		// the JSamp Server thread alive until after the dumping is done, which
+		// also excludes it from the stack traces
 		new Thread(jsampler, "JSamp Server") {
 			public void run() {
 				try {
 					Socket socket = new ServerSocket(port).accept();
+					jsampler.stop();
+					jsamplerThread.join();
+					socket.close();
 				} catch (Exception ex) {
 					throw new RuntimeException(ex);
 				}
-				jsampler.stop();
 			}
 		}.start();
 	}
