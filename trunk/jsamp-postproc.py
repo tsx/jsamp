@@ -9,19 +9,18 @@ from optparse import OptionParser
 from sys import argv, stdin, exit
 from re import compile
 
-frame_pat = compile(r"^([^(]+)\(([^)]+)\)$")
+frame_pat = compile(r"^(?P<method>[^(]+)\((?P<location>.+)\)$")
 
-def parse_stacks(f):
+def parse_stacks(f, merge_overloads):
     stack = []
     for line in f:
         if line == "\n":
             if len(stack) > 0: yield stack
             stack = []
         else:
-            match = frame_pat.match(line)
-            method = match.group(1)
-            location = match.group(2)
-            stack.append((method, location))
+            stack.append((line.rstrip('\n'), None)
+                         if not merge_overloads else
+                         frame_pat.match(line).groups())
     if len(stack) > 0:
         yield stack
 
@@ -36,12 +35,15 @@ def main(argv):
     p = OptionParser()
     p.add_option('-x', '--exclude', action = 'append',
                  help = 'filter out stacks whose traces include the given string')
+    p.add_option('-m', '--merge-overloads', action = 'store_true',
+                 help = '''treat all overloads with the same function name as
+                 the same function (aggregate their samples)''')
     opts, args = p.parse_args()
 
     # Maps method name -> [selfcount , self+children]
     total_methods = {}
     if opts.exclude is None: opts.exclude = []
-    stacks = list(filter_stacks(parse_stacks(stdin), opts.exclude))
+    stacks = list(filter_stacks(parse_stacks(stdin, opts.merge_overloads), opts.exclude))
     nstacks = len(stacks)
 
     for stack in stacks:
