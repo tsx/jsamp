@@ -39,12 +39,21 @@ def parse_stacks(f, merge_overloads):
                   frame_pat.match(line).groups() )
                 for line in par ]
 
-def filter_stacks(stacks, filters):
+def filter_stacks(stacks, filters, match_any = False):
+    """
+    match_any means that we will filter out stacks not just by the top-most
+    frame but any of its frames.
+    """
     for stack in stacks:
-        for meth, loc in stack:
-            if any(meth.startswith(filter) for filter in filters): break
+        if match_any:
+            for meth, loc in stack:
+                if any(meth.startswith(filter) for filter in filters): break
+            else:
+                yield stack
         else:
-            yield stack
+            meth, loc = stack[0]
+            if not any(meth.startswith(filter) for filter in filters):
+                yield stack
 
 class methinfo(object):
     def __init__(self):
@@ -64,17 +73,22 @@ def cgline(meth, count, total):
 def main(argv):
     p = optparse.OptionParser()
     p.add_option('-x', '--exclude', action = 'append',
-                 help = 'filter out stacks whose traces include the given string')
+                 help = 'filter out stacks where the top frame begins with the
+                 given string')
     p.add_option('-m', '--merge-overloads', action = 'store_true',
                  help = '''treat all overloads with the same function name as
                  the same function (aggregate their samples)''')
     p.add_option('-g', '--call-graph', action = 'store_true',
                  help = '''output an oprofile-formatted callgraph instead of
                  the flat aggregation summary''')
+    p.add_option('-f', '--filter-any', action = 'store_true',
+                 help = '''filter out stacks where the frames specified via
+                 --exclude appear anywhere in the stack''')
     opts, args = p.parse_args()
     if opts.exclude is None: opts.exclude = []
 
-    stacks = list(filter_stacks(parse_stacks(sys.stdin, opts.merge_overloads), opts.exclude))
+    stacks = list(filter_stacks(parse_stacks(sys.stdin, opts.merge_overloads),
+                                opts.exclude, opts.filter_any))
     # method name -> methinfo
     meth2info = collections.defaultdict(methinfo)
 
