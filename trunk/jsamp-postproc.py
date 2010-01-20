@@ -73,8 +73,8 @@ def cgline(meth, count, total):
 def main(argv):
     p = optparse.OptionParser()
     p.add_option('-x', '--exclude', action = 'append',
-                 help = 'filter out stacks where the top frame begins with the
-                 given string')
+                 help = '''filter out stacks where the top frame begins with the
+                 given string''')
     p.add_option('-m', '--merge-overloads', action = 'store_true',
                  help = '''treat all overloads with the same function name as
                  the same function (aggregate their samples)''')
